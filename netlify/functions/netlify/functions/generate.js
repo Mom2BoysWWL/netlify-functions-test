@@ -2,22 +2,41 @@
 
 exports.handler = async (event) => {
   try {
+    // ✅ Handle CORS preflight
+    if (event.httpMethod === "OPTIONS") {
+      return {
+        statusCode: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Methods": "POST, OPTIONS"
+        },
+        body: ""
+      };
+    }
+
+    // ✅ Only allow POST
     if (event.httpMethod !== "POST") {
-      return { statusCode: 405, body: "Method Not Allowed" };
+      return {
+        statusCode: 405,
+        headers: {
+          "Access-Control-Allow-Origin": "*"
+        },
+        body: "Method Not Allowed"
+      };
     }
 
     const { message, tone } = JSON.parse(event.body || "{}");
 
     if (!message) {
       return {
-  statusCode: 200,
-  headers: {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "Content-Type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS"
-  },
-  body: JSON.stringify({ result })
-};
+        statusCode: 400,
+        headers: {
+          "Access-Control-Allow-Origin": "*"
+        },
+        body: JSON.stringify({ error: "Missing message" })
+      };
+    }
 
     const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
@@ -49,7 +68,6 @@ Message:
     });
 
     const data = await response.json();
-
     const result = data.choices?.[0]?.message?.content || "No response";
 
     return {
@@ -64,6 +82,9 @@ Message:
   } catch (err) {
     return {
       statusCode: 500,
+      headers: {
+        "Access-Control-Allow-Origin": "*"
+      },
       body: JSON.stringify({ error: err.message })
     };
   }
