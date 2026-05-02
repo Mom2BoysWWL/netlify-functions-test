@@ -7,5 +7,24 @@
 </head>
 <body>
     <h1>Hello, Netlify Functions!</h1>
-</body>
+    <!DOCTYPE html>
+<html>
+  <body>
+    <h1>Test Netlify Function</h1>
+    <input id="name" placeholder="Enter your name" />
+    <button onclick="callFunction()">Say Hello</button>
+
+    <p id="output"></p>
+
+    <script>
+      async function callFunction() {
+        const name = document.getElementById("name").value;
+        const res = await fetch(
+          `/.netlify/functions/hello?name=${name}`
+        );
+        const data = await res.json();
+        document.getElementById("output").innerText = data.message;
+      }
+    </script>
+  </body>
 </html>
