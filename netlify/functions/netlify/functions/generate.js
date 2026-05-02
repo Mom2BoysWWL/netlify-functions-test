@@ -10,10 +10,14 @@ exports.handler = async (event) => {
 
     if (!message) {
       return {
-        statusCode: 400,
-        body: JSON.stringify({ error: "Missing message" })
-      };
-    }
+  statusCode: 200,
+  headers: {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS"
+  },
+  body: JSON.stringify({ result })
+};
 
     const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
