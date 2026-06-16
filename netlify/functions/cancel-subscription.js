@@ -24,18 +24,29 @@ exports.handler = async (event) => {
   try {
     const { subscriptionId } = JSON.parse(event.body || "{}");
 
-    if (!subscriptionId) {
+    if (!subscriptionId || typeof subscriptionId !== "string" || !subscriptionId.startsWith("sub_")) {
       return {
         statusCode: 400,
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ error: "subscriptionId is required" })
+        body: JSON.stringify({ error: "A valid subscriptionId (starting with 'sub_') is required" })
       };
     }
 
     const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+
+    if (!STRIPE_SECRET_KEY) {
+      return {
+        statusCode: 500,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ error: "Server configuration error" })
+      };
+    }
 
     const response = await fetch(
       `https://api.stripe.com/v1/subscriptions/${subscriptionId}`,
@@ -76,7 +87,7 @@ exports.handler = async (event) => {
     return {
       statusCode: 500,
       headers: { "Access-Control-Allow-Origin": "*" },
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({ error: "An unexpected error occurred" })
     };
   }
 };

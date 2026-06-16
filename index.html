@@ -32,8 +32,12 @@
       }
 
       async function cancelSubscription() {
-        const subscriptionId = document.getElementById("subscriptionId").value;
+        const subscriptionId = document.getElementById("subscriptionId").value.trim();
         const outputEl = document.getElementById("cancel-output");
+        if (!subscriptionId) {
+          outputEl.innerText = "Please enter a subscription ID.";
+          return;
+        }
         outputEl.innerText = "Cancelling...";
         try {
           const res = await fetch("/.netlify/functions/cancel-subscription", {
