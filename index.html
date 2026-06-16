@@ -16,6 +16,11 @@
 
     <p id="output"></p>
 
+    <h2>Cancel Subscription</h2>
+    <input id="subscriptionId" placeholder="Enter your subscription ID" />
+    <button onclick="cancelSubscription()">Cancel Subscription</button>
+    <p id="cancel-output"></p>
+
     <script>
       async function callFunction() {
         const name = document.getElementById("name").value;
@@ -24,6 +29,23 @@
         );
         const data = await res.json();
         document.getElementById("output").innerText = data.message;
+      }
+
+      async function cancelSubscription() {
+        const subscriptionId = document.getElementById("subscriptionId").value;
+        const outputEl = document.getElementById("cancel-output");
+        outputEl.innerText = "Cancelling...";
+        try {
+          const res = await fetch("/.netlify/functions/cancel-subscription", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ subscriptionId })
+          });
+          const data = await res.json();
+          outputEl.innerText = data.message || data.error || "Unknown response";
+        } catch (err) {
+          outputEl.innerText = "Error: " + err.message;
+        }
       }
     </script>
   </body>
